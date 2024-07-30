@@ -1,37 +1,74 @@
-# Farm + React
+# クリック＆ドラッグ付箋アプリ
 
-This template should help you start developing using React and TypeScript in Farm.
+このプロジェクトは、React と TypeScript を使用して開発された、クリックとドラッグが可能な付箋アプリケーションです。ユーザーは画面上で付箋を自由に移動させることができます。
 
-## Setup
+## 機能
 
-Install the dependencies:
+- クリック可能な青い四角形（付箋）の表示
+- 付箋のドラッグ＆ドロップ機能
+- 日本語メッセージの表示
 
-```bash
-pnpm install
+## プロジェクト構成
+
+```
+.
+├── README.md
+├── bun.lockb
+├── farm.config.ts
+├── index.html
+├── package.json
+├── public
+│   └── favicon.ico
+├── src
+│   ├── assets
+│   │   ├── logo.png
+│   │   └── react.svg
+│   ├── index.css
+│   ├── index.tsx
+│   ├── main.css
+│   ├── main.tsx
+│   └── typings.d.ts
+├── tsconfig.json
+└── tsconfig.node.json
 ```
 
-## Get Started
+## セットアップ
 
-Start the dev server:
+1. リポジトリをクローンします：
+   ```
+   git clone https://github.com/yskmasumoto/fusen-web.git
+   ```
 
-```bash
-pnpm start
-```
+2. プロジェクトディレクトリに移動します：
+   ```
+   cd fusen-web
+   ```
 
-Build the app for production:
+3. 依存関係をインストールします：
+   ```
+   bun install
+   ```
 
-```bash
-pnpm build
-```
+4. アプリケーションを起動します：
+   ```
+   bun run dev
+   ```
 
-Preview the Production build product:
+## 開発
 
-```bash
-pnpm preview
-```
+- `main.tsx`: アプリケーションのメインコンポーネントが含まれています。
+- `index.tsx`: アプリケーションのエントリーポイントです。
+- `main.css`: スタイリングを担当します。
 
-Clear persistent cache local files
+## 今後の開発予定
 
-```bash
-pnpm clean
-```
+- 複数の付箋の追加機能
+- 付箋のリサイズ機能
+- 色変更オプションの実装
+- 付箋に書いた内容の保存
+
+## 
+
+---
+
+このプロジェクトは開発中です。機能の追加や改善に関するフィードバックを歓迎します。
