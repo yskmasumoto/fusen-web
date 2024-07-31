@@ -1,9 +1,9 @@
 import { createRoot } from 'react-dom/client';
-import DraggableObject  from './main';
+import App  from './main';
 import './index.css'
 
 
 const container = document.querySelector('#root');
 const root = createRoot(container);
 
-root.render(<DraggableObject />);
+root.render(<App />);
