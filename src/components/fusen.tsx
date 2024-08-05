@@ -6,7 +6,11 @@ interface Position {
 	y: number;
 }
 
-const DraggableObject: React.FC = () => {
+interface DraggableObjectProps {
+	onDelete: () => void;
+}
+
+const DraggableObject: React.FC<DraggableObjectProps> = ({ onDelete }) => {
 	const [position, setPosition] = useState<Position>({ x: 0, y: 0 });
 	const [isDragging, setIsDragging] = useState<boolean>(false);
 	const [trail, setTrail] = useState<Position[]>([]);
@@ -67,7 +71,6 @@ const DraggableObject: React.FC = () => {
 					/>
 				))}
 			<div
-				contentEditable
 				ref={ref}
 				style={{
 					position: "absolute",
@@ -86,7 +89,25 @@ const DraggableObject: React.FC = () => {
 				}}
 				onMouseDown={handleMouseDown}
 			>
-				ドラッグして動かせます
+				<div contentEditable>ドラッグして動かせます</div>
+				<button
+					onClick={onDelete}
+					style={{
+						position: "absolute",
+						top: "5px",
+						right: "5px",
+						background: "red",
+						color: "white",
+						border: "none",
+						borderRadius: "50%",
+						width: "20px",
+						height: "20px",
+						fontSize: "12px",
+						cursor: "pointer",
+					}}
+				>
+					X
+				</button>
 			</div>
 		</>
 	);
