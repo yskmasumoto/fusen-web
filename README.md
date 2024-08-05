@@ -12,7 +12,9 @@
 
 ```
 .
+├── LICENSE
 ├── README.md
+├── biome.json
 ├── bun.lockb
 ├── farm.config.ts
 ├── index.html
@@ -23,6 +25,9 @@
 │   ├── assets
 │   │   ├── logo.png
 │   │   └── react.svg
+│   ├── components
+│   │   ├── fusen.tsx
+│   │   └── fusenManage.tsx
 │   ├── index.css
 │   ├── index.tsx
 │   ├── main.css
@@ -62,7 +67,6 @@
 
 ## 今後の開発予定
 
-- 複数の付箋の追加機能
 - 付箋のリサイズ機能
 - 色変更オプションの実装
 - 付箋に書いた内容の保存
