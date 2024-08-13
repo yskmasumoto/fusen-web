@@ -61,8 +61,8 @@ const DraggableObject: React.FC<DraggableObjectProps> = ({ onDelete }) => {
 							position: "absolute",
 							left: `${pos.x}px`,
 							top: `${pos.y}px`,
-							width: "100px",
-							height: "100px",
+							width: "200px",
+							height: "140px",
 							backgroundColor: "rgba(0, 0, 255, 0.2)",
 							pointerEvents: "none",
 							transition: "opacity 0.3s",
@@ -77,53 +77,60 @@ const DraggableObject: React.FC<DraggableObjectProps> = ({ onDelete }) => {
 					left: `${position.x}px`,
 					top: `${position.y}px`,
 					width: "200px",
-					// height: "100px",
-					// backgroundColor: "blue",
-					// cursor: isDragging ? "grabbing" : "grab",
+					height: "100px",
 					zIndex: 1,
 					transition: "box-shadow 0.3s, transform 0.3s",
-					borderRadius: '10px',
+					borderRadius: "10px",
 					boxShadow: isDragging
 						? "0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22)"
 						: "0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)",
 					transform: isDragging ? "scale(1.05)" : "scale(1)",
 				}}
-			// onMouseDown={handleMouseDown}
 			>
 				<div
 					style={{
-						backgroundColor: '#808080',
-						padding: '10px',
-						display: 'flex',
-						justifyContent: 'flex-end',
-						alignItems: 'center',
+						backgroundColor: "#808080",
+						padding: "10px",
+						display: "flex",
+						height: "20px",
+						justifyContent: "flex-end",
+						alignItems: "center",
 						cursor: isDragging ? "grabbing" : "grab",
 					}}
 					onMouseDown={handleMouseDown}
 				>
-					{/* <div contentEditable>ドラッグして動かせます</div> */}
 					<button
 						onClick={onDelete}
 						style={{
-							background: 'red',
-							color: 'white',
-							border: 'none',
-							borderRadius: '50%',
-							width: '20px',
-							height: '20px',
-							fontSize: '12px',
-							cursor: 'pointer',
-							display: 'flex',
-							justifyContent: 'center',
-							alignItems: 'center',
-							padding: 0,  // パディングを削除
-							lineHeight: 1,  // 行の高さを調整
-							boxSizing: 'border-box',  // ボックスモデルを調整
-							overflow: 'hidden',  // はみ出す内容を隠す
+							background: "red",
+							color: "white",
+							border: "none",
+							borderRadius: "50%",
+							width: "20px",
+							height: "20px",
+							fontSize: "12px",
+							cursor: "pointer",
+							display: "flex",
+							justifyContent: "center",
+							alignItems: "center",
+							padding: 0, // パディングを削除
+							lineHeight: 1, // 行の高さを調整
+							boxSizing: "border-box", // ボックスモデルを調整
+							overflow: "hidden", // はみ出す内容を隠す
 						}}
 					>
 						✕
 					</button>
+				</div>
+				<div
+					contentEditable
+					style={{
+						width: "200px",
+						height: "100px",
+						backgroundColor: "blue",
+					}}
+				>
+					ドラッグして動かせます
 				</div>
 			</div>
 		</>
