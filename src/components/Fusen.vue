@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, onUnmounted, ref } from 'vue';
 import DOMPurify from 'dompurify';
-import { marked } from 'marked';
 
 interface Position {
   x: number;
@@ -36,7 +35,7 @@ const getMarkdownHtml = (source: string): string => {
     return bunMarkdown(source);
   }
 
-  return marked.parse(source, { async: false }) as string;
+	return '<p>Markdown parser is unavailable in this runtime.</p>';
 };
 
 const renderedHtml = computed(() => {
