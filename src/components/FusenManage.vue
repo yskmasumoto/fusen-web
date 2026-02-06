@@ -12,7 +12,7 @@ interface Note {
 
 const storageKey = 'fusen-web.notes.v1';
 const notes = ref<Note[]>([]);
-const defaultMarkdown = '# 新しい付箋\n\n- Markdownでメモ\n- ドラッグで移動\n\n`/`で囲むとコード';
+const defaultMarkdown = '# 新しい付箋\n\n- Markdownでメモ\n- ドラッグで移動\n\n`バッククォート`で囲むとコード';
 const boardRef = ref<HTMLDivElement | null>(null);
 const folderHandle = ref<FileSystemDirectoryHandle | null>(null);
 const saveStatus = ref('');
