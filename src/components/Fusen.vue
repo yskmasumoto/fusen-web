@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onUnmounted, ref } from 'vue';
 import DOMPurify from 'dompurify';
+import { marked } from 'marked';
 
 interface Position {
   x: number;
@@ -28,14 +29,7 @@ const isTrailVisible = ref(false);
 const dragOffset = ref<Position>({ x: 0, y: 0 });
 
 const getMarkdownHtml = (source: string): string => {
-  const bunMarkdown = (globalThis as { Bun?: { markdown?: { html?: (input: string) => string } } })
-    .Bun?.markdown?.html;
-
-  if (bunMarkdown) {
-    return bunMarkdown(source);
-  }
-
-	return '<p>Markdown parser is unavailable in this runtime.</p>';
+  return marked.parse(source, { async: false }) as string;
 };
 
 const renderedHtml = computed(() => {
