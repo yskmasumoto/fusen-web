@@ -16,8 +16,11 @@ const defaultMarkdown = '# 新しい付箋\n\n- Markdownでメモ\n- ドラッ�
 const boardRef = ref<HTMLDivElement | null>(null);
 const folderHandle = ref<FileSystemDirectoryHandle | null>(null);
 const saveStatus = ref('');
+const failedNoteIds = ref<number[]>([]);
 const supportsFileSystemAccess = 'showDirectoryPicker' in window;
 let saveTimer: number | undefined;
+let lastIdTimestamp = 0;
+let lastIdCounter = 0;
 
 type FileSystemHandlePermissionDescriptor = {
   mode?: 'read' | 'readwrite';
@@ -31,11 +34,23 @@ declare global {
 
 const folderLabel = computed(() => folderHandle.value?.name ?? '未選択');
 
+const createNoteId = (): number => {
+  const timestamp = Date.now();
+  if (timestamp === lastIdTimestamp) {
+    lastIdCounter = (lastIdCounter + 1) % 1000;
+  } else {
+    lastIdTimestamp = timestamp;
+    lastIdCounter = 0;
+  }
+
+  return timestamp * 1000 + lastIdCounter;
+};
+
 const addNote = () => {
   const index = notes.value.length;
   const offset = 24 + (index % 6) * 18;
   const newNote: Note = {
-    id: Date.now(),
+    id: createNoteId(),
     x: 32 + offset,
     y: 32 + offset,
     markdown: defaultMarkdown,
@@ -99,19 +114,32 @@ const ensureFolderPermission = async () => {
 };
 
 const writeNoteToFolder = async (note: Note) => {
-  if (!folderHandle.value) return;
+  if (!folderHandle.value) return { ok: false, noteId: note.id, reason: 'no-folder' } as const;
 
-  const filename = `note-${note.id}.md`;
-  const fileHandle = await folderHandle.value.getFileHandle(filename, { create: true });
-  const writable = await fileHandle.createWritable();
-  await writable.write(note.markdown);
-  await writable.close();
+  try {
+    const filename = `note-${note.id}.md`;
+    const fileHandle = await folderHandle.value.getFileHandle(filename, { create: true });
+    const writable = await fileHandle.createWritable();
+    await writable.write(note.markdown);
+    await writable.close();
+    return { ok: true, noteId: note.id } as const;
+  } catch {
+    return { ok: false, noteId: note.id, reason: 'write-failed' } as const;
+  }
 };
 
-const saveAllNotes = async () => {
+const saveAllNotes = async (options: { allowPick?: boolean } = {}) => {
+  const allowPick = options.allowPick ?? true;
   if (!folderHandle.value) {
-    saveStatus.value = '保存先フォルダが選択されていません。';
-    return;
+    if (allowPick) {
+      const picked = await pickFolder();
+      if (!picked) {
+        return;
+      }
+    } else {
+      saveStatus.value = '保存先フォルダが選択されていません。';
+      return;
+    }
   }
 
   if (!(await ensureFolderPermission())) {
@@ -119,32 +147,48 @@ const saveAllNotes = async () => {
     return;
   }
 
-  await Promise.all(notes.value.map((note) => writeNoteToFolder(note)));
+  const results = await Promise.allSettled(notes.value.map((note) => writeNoteToFolder(note)));
+  const failures = results.filter((result) =>
+    result.status === 'fulfilled' ? !result.value.ok : true,
+  );
+
+  if (failures.length > 0) {
+    failedNoteIds.value = failures
+      .map((result) => (result.status === 'fulfilled' ? result.value.noteId : null))
+      .filter((noteId): noteId is number => typeof noteId === 'number');
+    saveStatus.value = `一部保存できませんでした (${failures.length}件)。再試行してください。`;
+    return;
+  }
+
+  failedNoteIds.value = [];
   saveStatus.value = `保存しました: ${new Date().toLocaleTimeString()}`;
 };
 
-const pickFolder = async () => {
+const pickFolder = async (): Promise<boolean> => {
   saveStatus.value = '';
   if (!supportsFileSystemAccess) {
     saveStatus.value = 'このブラウザはフォルダ選択に対応していません。';
-    return;
+    return false;
   }
 
   try {
     const picker = window.showDirectoryPicker;
     if (!picker) {
       saveStatus.value = 'このブラウザはフォルダ選択に対応していません。';
-      return;
+      return false;
     }
 
     const handle = await picker();
     folderHandle.value = handle;
     await ensureFolderPermission();
     saveStatus.value = `保存先: ${handle.name}`;
+    failedNoteIds.value = [];
+    return true;
   } catch (error) {
     if ((error as { name?: string }).name !== 'AbortError') {
       saveStatus.value = 'フォルダ選択に失敗しました。';
     }
+    return false;
   }
 };
 
@@ -155,7 +199,7 @@ const normalizeNotes = (raw: unknown): Note[] => {
 
   return raw.map((item, index) => {
     const candidate = typeof item === 'object' && item ? (item as Record<string, unknown>) : {};
-    const id = typeof candidate.id === 'number' ? candidate.id : Date.now() + index;
+    const id = typeof candidate.id === 'number' ? candidate.id : createNoteId();
     const x = typeof candidate.x === 'number' ? candidate.x : 32 + index * 12;
     const y = typeof candidate.y === 'number' ? candidate.y : 32 + index * 12;
     const markdown = typeof candidate.markdown === 'string' ? candidate.markdown : defaultMarkdown;
@@ -204,7 +248,7 @@ watch(
     }
 
     saveTimer = window.setTimeout(() => {
-      void saveAllNotes();
+      void saveAllNotes({ allowPick: false });
     }, 700);
   },
   { deep: true },
@@ -226,11 +270,14 @@ onMounted(() => {
         <span class="value">{{ folderLabel }}</span>
       </div>
       <div class="board-meta__actions">
-        <button class="ghost" type="button" @click="pickFolder">フォルダを選択</button>
-        <button class="ghost" type="button" @click="saveAllNotes">今すぐ保存</button>
+        <button class="ghost" type="button" @click="() => pickFolder()">フォルダを選択</button>
+        <button class="ghost" type="button" @click="() => saveAllNotes()">今すぐ保存</button>
         <button class="ghost" type="button" @click="gatherNotes">付箋を集約</button>
       </div>
       <p v-if="saveStatus" class="board-meta__status">{{ saveStatus }}</p>
+      <p v-if="failedNoteIds.length" class="board-meta__failures">
+        失敗したノートID: {{ failedNoteIds.join(', ') }}
+      </p>
     </div>
 		<div class="toolbar">
 			<button class="primary" type="button" @click="addNote">付箋を追加</button>

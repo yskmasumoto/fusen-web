@@ -118,17 +118,70 @@ onUnmounted(() => {
 		}"
 	>
 		<div class="note-header" @mousedown.prevent="startDrag">
-			<button class="icon-button" type="button" @mousedown.stop @click="toggleEdit">
-				{{ note.isEditing ? "プレビュー" : "編集" }}
-			</button>
-			<button
-				class="icon-button danger"
-				type="button"
-				@mousedown.stop
-				@click="deleteNote"
-			>
-				✕
-			</button>
+			<div class="note-controls">
+				<span class="note-id">ID {{ note.id }}</span>
+				<div class="icon-controls">
+					<button
+						class="icon-button"
+						type="button"
+						@mousedown.stop
+						@click="toggleEdit"
+						:aria-label="note.isEditing ? 'プレビューに切り替え' : 'エディットモードに切り替え'"
+					>
+						<svg
+							v-if="note.isEditing"
+							viewBox="0 0 24 24"
+							fill="none"
+							aria-hidden="true"
+						>
+							<path
+								d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"
+								stroke="currentColor"
+								stroke-width="1.5"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							/>
+							<path
+								d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"
+								stroke="currentColor"
+								stroke-width="1.5"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							/>
+						</svg>
+						<svg
+							v-else
+							viewBox="0 0 24 24"
+							fill="none"
+							aria-hidden="true"
+						>
+							<path
+								d="M4 17.25V20h2.75L17.81 8.94l-2.75-2.75L4 17.25z"
+								stroke="currentColor"
+								stroke-width="1.5"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							/>
+							<path
+								d="M14.06 4.94l2.75 2.75"
+								stroke="currentColor"
+								stroke-width="1.5"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							/>
+						</svg>
+					</button>
+					<button
+						class="icon-button danger"
+						type="button"
+						@mousedown.stop
+						@click="deleteNote"
+						aria-label="ノートを削除"
+					>
+						✕
+					</button>
+				</div>
+			</div>
 		</div>
 		<div class="note-body">
 			<textarea
